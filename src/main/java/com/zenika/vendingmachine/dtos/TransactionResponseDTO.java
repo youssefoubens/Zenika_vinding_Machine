@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @Builder
@@ -20,6 +21,7 @@ public class TransactionResponseDTO {
     private double changeReturned;
     private TransactionStatus status;
     private LocalDateTime timestamp;
+    private Map<String, Integer> changeBreakdown; // e.g., {"TEN_DH": 1, "FIVE_DH": 1}
 
     @Data
     @Builder
@@ -31,5 +33,6 @@ public class TransactionResponseDTO {
         private int quantity;
         private double unitPrice;
         private double totalPrice;
+
     }
 }

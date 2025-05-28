@@ -2,6 +2,9 @@ package com.zenika.vendingmachine.enums;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Enum representing valid coin denominations in MAD (Moroccan Dirham)
@@ -41,6 +44,11 @@ public enum Coin {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid coin value: " + value));
     }
 
+    public static List<Coin> sortedDesc() {
+        return Arrays.stream(Coin.values())
+                .sorted(Comparator.comparing(Coin::getValue).reversed())
+                .collect(Collectors.toList());
+    }
     @Override
     public String toString() {
         return value + " MAD";

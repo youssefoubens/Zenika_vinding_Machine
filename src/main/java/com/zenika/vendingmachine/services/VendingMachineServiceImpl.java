@@ -17,10 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Transactional
 @Service
@@ -136,6 +135,11 @@ public class VendingMachineServiceImpl implements VendingMachineService {
         currentTransaction.setChangeGiven(change);
         currentTransaction.setStatus(TransactionStatus.COMPLETED);
 
+
+        // Calculate change breakdown (if needed)
+        Map<Coin, Integer> changeBreakdown = calculateChangeBreakdown(change);
+        changeBreakdown.forEach((coin, count) -> {System.out.println("Return " + count + " x " + coin.name() + " (" + coin.getValue() + " DH)");});
+
         // Update product quantities
         currentTransaction.getItems().forEach(item -> {
             Product product = item.getProduct();
@@ -174,4 +178,22 @@ public class VendingMachineServiceImpl implements VendingMachineService {
                 .orElseThrow(() -> new IllegalArgumentException("Transaction not found with id: " + transactionId));
         return transactionMapper.toResponseDto(transaction);
     }
+
+
+    public Map<Coin, Integer> calculateChangeBreakdown(double changeAmount) {
+        Map<Coin, Integer> changeMap = new LinkedHashMap<>();
+        BigDecimal remaining = BigDecimal.valueOf(changeAmount).setScale(2, RoundingMode.HALF_UP);
+
+        for (Coin coin : Coin.sortedDesc()) {
+            BigDecimal coinValue = coin.getValue();
+            int count = remaining.divide(coinValue, 0, RoundingMode.FLOOR).intValue();
+            if (count > 0) {
+                changeMap.put(coin, count);
+                remaining = remaining.subtract(coinValue.multiply(BigDecimal.valueOf(count)));
+            }
+        }
+
+        return changeMap;
+    }
+
 }

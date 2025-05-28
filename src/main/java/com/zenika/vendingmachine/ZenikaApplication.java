@@ -30,31 +30,31 @@ public class ZenikaApplication  {
                     .name("Coca-Cola")
                     .price(1.50)
                     .stock(10)
-                    .build();
+                    .stockQuantity(14).build();
 
             Product pepsi = Product.builder()
                     .name("Pepsi")
                     .price(1.45)
                     .stock(8)
-                    .build();
+                    .stockQuantity(10).build();
 
             Product water = Product.builder()
                     .name("Mineral Water")
                     .price(1.00)
                     .stock(15)
-                    .build();
+                    .stockQuantity(18).build();
 
             Product chips = Product.builder()
                     .name("Potato Chips")
                     .price(2.00)
                     .stock(5)
-                    .build();
+                    .stockQuantity(12).build();
 
             Product chocolate = Product.builder()
                     .name("Chocolate Bar")
                     .price(1.75)
                     .stock(12)
-                    .build();
+                    .stockQuantity(13).build();
 
             List<Product> savedProducts = productRepository.saveAll(List.of(coke, pepsi, water, chips, chocolate));
 

@@ -15,5 +15,5 @@ public class TransactionItemDTO {
     private double unitPrice;
     private double totalPrice;
 
-    // Constructors, getters, setters
+
 }
