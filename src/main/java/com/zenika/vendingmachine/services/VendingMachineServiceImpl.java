@@ -5,6 +5,7 @@ import com.zenika.vendingmachine.dtos.TransactionResponseDTO;
 import com.zenika.vendingmachine.entities.Product;
 import com.zenika.vendingmachine.entities.Transaction;
 import com.zenika.vendingmachine.entities.TransactionItem;
+import com.zenika.vendingmachine.enums.Coin;
 import com.zenika.vendingmachine.enums.TransactionStatus;
 import com.zenika.vendingmachine.execptions.InsufficientFundsException;
 import com.zenika.vendingmachine.execptions.ProductUnavailableException;
@@ -15,6 +16,7 @@ import com.zenika.vendingmachine.repositories.TransactionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +53,10 @@ public class VendingMachineServiceImpl implements VendingMachineService {
         if (amount <= 0) {
             throw new IllegalArgumentException("Amount must be positive");
         }
-
+        BigDecimal amountBD = BigDecimal.valueOf(amount);
+        if (!Coin.isValidCoinValue(amountBD)) {
+            throw new IllegalArgumentException("Invalid coin value: " + amount);
+        }
         if (currentTransaction == null) {
             currentTransaction = Transaction.builder()
                     .amountReceived(amount)
