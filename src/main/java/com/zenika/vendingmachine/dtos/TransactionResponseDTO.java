@@ -1,23 +1,35 @@
 package com.zenika.vendingmachine.dtos;
 
 import com.zenika.vendingmachine.enums.TransactionStatus;
-
-import java.time.LocalDateTime;
-import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
-@NoArgsConstructor
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class TransactionResponseDTO {
-    private Long transactionId;
-    private List<TransactionItemDTO> purchasedItems;
+    private List<TransactionItemResponse> items;
     private double totalAmount;
-    private double changeGiven;
+    private double amountInserted;
+    private double changeReturned;
     private TransactionStatus status;
     private LocalDateTime timestamp;
 
-    // Constructors, getters, setters
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TransactionItemResponse {
+        private Long productId;
+        private String productName;
+        private int quantity;
+        private double unitPrice;
+        private double totalPrice;
+    }
 }

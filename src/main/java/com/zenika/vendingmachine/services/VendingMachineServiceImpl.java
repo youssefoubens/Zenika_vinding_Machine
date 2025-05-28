@@ -4,8 +4,8 @@ import com.zenika.vendingmachine.dtos.ProductDTO;
 import com.zenika.vendingmachine.dtos.TransactionResponseDTO;
 import com.zenika.vendingmachine.entities.Product;
 import com.zenika.vendingmachine.entities.Transaction;
+import com.zenika.vendingmachine.entities.TransactionItem;
 import com.zenika.vendingmachine.enums.TransactionStatus;
-
 import com.zenika.vendingmachine.execptions.InsufficientFundsException;
 import com.zenika.vendingmachine.execptions.ProductUnavailableException;
 import com.zenika.vendingmachine.mappers.ProductMapper;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,17 +42,24 @@ public class VendingMachineServiceImpl implements VendingMachineService {
 
     @Override
     public List<ProductDTO> getAvailableProducts() {
-        List<Product> availableProducts = productRepository.findByQuantityGreaterThan(0);
+        List<Product> availableProducts = productRepository.findByStockGreaterThan(0);
         return productMapper.toDtoList(availableProducts);
     }
 
     @Override
     public void insertCoin(double amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Amount must be positive");
+        }
+
         if (currentTransaction == null) {
             currentTransaction = Transaction.builder()
                     .amountReceived(amount)
                     .status(TransactionStatus.IN_PROGRESS)
-                    .totalAmount().changeGiven().build();
+                    .items(new ArrayList<>())
+                    .totalAmount(0.0)
+                    .changeGiven(0.0)
+                    .build();
         } else {
             currentTransaction.setAmountReceived(currentTransaction.getAmountReceived() + amount);
         }
@@ -59,10 +67,18 @@ public class VendingMachineServiceImpl implements VendingMachineService {
 
     @Override
     public void selectProduct(Long productId, int quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be positive");
+        }
+
         if (currentTransaction == null) {
             currentTransaction = Transaction.builder()
                     .status(TransactionStatus.IN_PROGRESS)
-                    .totalAmount().amountReceived().changeGiven().build();
+                    .items(new ArrayList<>())
+                    .amountReceived(0.0)
+                    .totalAmount(0.0)
+                    .changeGiven(0.0)
+                    .build();
         }
 
         Product product = productRepository.findById(productId)
@@ -72,8 +88,22 @@ public class VendingMachineServiceImpl implements VendingMachineService {
             throw new ProductUnavailableException("Not enough stock for product: " + product.getName());
         }
 
-        // Add product to transaction
-        currentTransaction.addItem(product, quantity);
+        // Check if product already exists in transaction
+        Optional<TransactionItem> existingItem = currentTransaction.getItems().stream()
+                .filter(item -> item.getProduct().getId().equals(productId))
+                .findFirst();
+
+        if (existingItem.isPresent()) {
+            existingItem.get().setQuantity(existingItem.get().getQuantity() + quantity);
+        } else {
+            TransactionItem newItem = TransactionItem.builder()
+                    .product(product)
+                    .quantity(quantity)
+                    .unitPrice(product.getPrice())
+                    .transaction(currentTransaction)
+                    .build();
+            currentTransaction.getItems().add(newItem);
+        }
     }
 
     @Override
@@ -87,20 +117,24 @@ public class VendingMachineServiceImpl implements VendingMachineService {
                 .mapToDouble(item -> item.getProduct().getPrice() * item.getQuantity())
                 .sum();
 
-        if (currentTransaction.getAmountReceived() < totalAmount) {
-            throw new InsufficientFundsException("Insufficient funds. Please insert more coins.");
+        currentTransaction.setTotalAmount(totalAmount);
+
+        if (!currentTransaction.canComplete()) {
+            throw new InsufficientFundsException(
+                    String.format("Insufficient funds. Required: %.2f, Inserted: %.2f",
+                            totalAmount, currentTransaction.getAmountReceived())
+            );
         }
 
-        // Update transaction details
-        currentTransaction.setTotalAmount(totalAmount);
-        currentTransaction.setChangeGiven(currentTransaction.getAmountReceived() - totalAmount);
+        // Calculate and set change
+        double change = currentTransaction.getRemainingBalance();
+        currentTransaction.setChangeGiven(change);
         currentTransaction.setStatus(TransactionStatus.COMPLETED);
-        currentTransaction.setTimestamp(LocalDateTime.now());
 
         // Update product quantities
         currentTransaction.getItems().forEach(item -> {
             Product product = item.getProduct();
-            product.setQuantity(product.getQuantity() - item.getQuantity());
+            product.setStock(product.getStock() - item.getQuantity());
             productRepository.save(product);
         });
 
@@ -118,7 +152,6 @@ public class VendingMachineServiceImpl implements VendingMachineService {
         }
 
         currentTransaction.setStatus(TransactionStatus.CANCELLED);
-        currentTransaction.setTimestamp(LocalDateTime.now());
         Transaction cancelledTransaction = transactionRepository.save(currentTransaction);
         currentTransaction = null; // Reset current transaction
 
@@ -127,13 +160,13 @@ public class VendingMachineServiceImpl implements VendingMachineService {
 
     @Override
     public double getCurrentBalance() {
-        return currentTransaction != null ? currentTransaction.getAmountReceived() : 0;
+        return currentTransaction != null ? currentTransaction.getAmountReceived() : 0.0;
     }
 
     @Override
     public TransactionResponseDTO getTransactionStatus(Long transactionId) {
         Transaction transaction = transactionRepository.findById(transactionId)
-                .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Transaction not found with id: " + transactionId));
         return transactionMapper.toResponseDto(transaction);
     }
 }
