@@ -24,6 +24,8 @@ public class Product {
 
     @Column(nullable = false)
     private int stock;
+    @Column(nullable = false)
+    private int stockQuantity;
 
     /**
      * Determines if the product can be purchased with the current balance

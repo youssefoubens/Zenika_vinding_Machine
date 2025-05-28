@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Service
 @Transactional
+@Service
 public class VendingMachineServiceImpl implements VendingMachineService {
 
     private final ProductRepository productRepository;

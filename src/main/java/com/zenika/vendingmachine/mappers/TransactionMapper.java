@@ -5,9 +5,9 @@ import com.zenika.vendingmachine.dtos.TransactionItemDTO;
 import com.zenika.vendingmachine.dtos.TransactionResponseDTO;
 import com.zenika.vendingmachine.entities.Transaction;
 import com.zenika.vendingmachine.entities.TransactionItem;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
+import org.mapstruct.*;
+
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 /**
  * Mapper interface for Transaction entity and DTOs
  */
+@Component
 @Mapper(componentModel = "spring")
 public interface TransactionMapper {
 
@@ -33,13 +34,14 @@ public interface TransactionMapper {
     /**
      * Converts Transaction entity to TransactionResponseDTO
      */
+
     @Mapping(target = "items", source = "items", qualifiedByName = "mapItemsToResponse")
     TransactionResponseDTO toResponseDto(Transaction transaction);
 
     /**
      * Maps TransactionItems to TransactionItemDTOs
      */
-
+    @Named("mapTransactionItemsToDTOs")
     default List<TransactionItemDTO> mapTransactionItemsToDTOs(List<TransactionItem> items) {
         if (items == null) {
             return null;

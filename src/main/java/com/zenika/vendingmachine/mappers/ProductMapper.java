@@ -4,16 +4,15 @@ import com.zenika.vendingmachine.dtos.CreateProductRequest;
 import com.zenika.vendingmachine.dtos.ProductDTO;
 import com.zenika.vendingmachine.entities.Product;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
+import org.mapstruct.*;
+import org.springframework.stereotype.Component;
+
 
 import java.math.BigDecimal;
 import java.util.List;
 
-/**
- * Mapper interface for Product entity and DTOs
- */
+
+@Component
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
 
