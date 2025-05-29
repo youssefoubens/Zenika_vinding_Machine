@@ -5,7 +5,4 @@ public class ProductUnavailableException extends RuntimeException {
         super(message);
     }
 
-    public ProductUnavailableException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }
