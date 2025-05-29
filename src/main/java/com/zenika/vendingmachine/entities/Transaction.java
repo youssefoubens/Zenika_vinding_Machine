@@ -6,7 +6,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name = "transactions")
@@ -38,6 +40,12 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TransactionStatus status;
+
+    @ElementCollection
+    @CollectionTable(name = "product_change_breakdown", joinColumns = @JoinColumn(name = "product_id"))
+    @MapKeyColumn(name = "coin")
+    @Column(name = "quantity")
+    private Map<String, Integer> changeBreakdown = new HashMap<>();
 
     @PrePersist
     public void prePersist() {

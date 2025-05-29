@@ -23,24 +23,13 @@ public interface TransactionMapper {
      * Converts Transaction entity to TransactionDTO
      */
     @Mapping(target = "items", source = "items", qualifiedByName = "mapTransactionItemsToDTOs")
-    @Mapping(target = "amountInserted", source = "amountReceived")
     TransactionDTO toDto(Transaction transaction);
 
-    /**
-     * Converts list of Transaction entities to list of TransactionDTOs
-     */
-    List<TransactionDTO> toDtoList(List<Transaction> transactions);
-
-    /**
-     * Converts Transaction entity to TransactionResponseDTO
-     */
 
     @Mapping(target = "items", source = "items", qualifiedByName = "mapItemsToResponse")
     TransactionResponseDTO toResponseDto(Transaction transaction);
 
-    /**
-     * Maps TransactionItems to TransactionItemDTOs
-     */
+
     @Named("mapTransactionItemsToDTOs")
     default List<TransactionItemDTO> mapTransactionItemsToDTOs(List<TransactionItem> items) {
         if (items == null) {

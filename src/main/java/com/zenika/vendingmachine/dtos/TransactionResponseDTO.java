@@ -17,8 +17,8 @@ import java.util.Map;
 public class TransactionResponseDTO {
     private List<TransactionItemResponse> items;
     private double totalAmount;
-    private double amountInserted;
-    private double changeReturned;
+    private double amountReceived;
+    private double changeGiven;
     private TransactionStatus status;
     private LocalDateTime timestamp;
     private Map<String, Integer> changeBreakdown; // e.g., {"TEN_DH": 1, "FIVE_DH": 1}
