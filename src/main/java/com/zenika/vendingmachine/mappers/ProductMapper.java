@@ -33,10 +33,6 @@ public interface ProductMapper {
      */
     List<ProductDTO> toDtoList(List<Product> products);
 
-    /**
-     * Converts CreateProductRequest to Product entity
-     */
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "stockQuantity", constant = "2147483647") // Integer.MAX_VALUE
-    Product fromCreateRequest(CreateProductRequest request);
+
+
 }
