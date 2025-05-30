@@ -34,16 +34,6 @@ public enum Coin {
                 .anyMatch(coin -> coin.getValue().compareTo(value) == 0);
     }
 
-    /**
-     * Gets coin by value
-     */
-    public static Coin fromValue(BigDecimal value) {
-        return Arrays.stream(Coin.values())
-                .filter(coin -> coin.getValue().compareTo(value) == 0)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Invalid coin value: " + value));
-    }
-
     public static List<Coin> sortedDesc() {
         return Arrays.stream(Coin.values())
                 .sorted(Comparator.comparing(Coin::getValue).reversed())

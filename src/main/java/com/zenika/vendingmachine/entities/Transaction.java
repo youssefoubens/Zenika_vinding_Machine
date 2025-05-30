@@ -25,20 +25,13 @@ public class Transaction {
     @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TransactionItem> items = new ArrayList<>();
 
-    @Column(nullable = false)
+
     private double totalAmount;
-
-    @Column(nullable = false)
     private double amountReceived;
-
-    @Column(nullable = false)
     private double changeGiven;
-
-    @Column(nullable = false)
     private LocalDateTime timestamp;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private TransactionStatus status;
 
     @ElementCollection
@@ -59,12 +52,6 @@ public class Transaction {
         return amountReceived - totalAmount;
     }
 
-    /**
-     * Calculates total number of items.
-     */
-    public int getTotalItemsInCart() {
-        return items.stream().mapToInt(TransactionItem::getQuantity).sum();
-    }
 
     /**
      * Determines if transaction can be completed (enough money received).

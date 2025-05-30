@@ -15,21 +15,11 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
     private String name;
-
-    @Column(nullable = false)
     private double price;
-
-    @Column(nullable = false)
     private int stock;
-    @Column(nullable = false)
     private int stockQuantity;
 
-    /**
-     * Determines if the product can be purchased with the current balance
-     */
     public boolean isPurchasable(BigDecimal currentBalance) {
         return stock > 0 && currentBalance.compareTo(BigDecimal.valueOf(price)) >= 0;
     }
