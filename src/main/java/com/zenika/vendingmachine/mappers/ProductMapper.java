@@ -1,6 +1,5 @@
 package com.zenika.vendingmachine.mappers;
 
-import com.zenika.vendingmachine.dtos.CreateProductRequest;
 import com.zenika.vendingmachine.dtos.ProductDTO;
 import com.zenika.vendingmachine.entities.Product;
 
