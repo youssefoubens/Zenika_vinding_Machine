@@ -34,12 +34,6 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     private TransactionStatus status;
 
-    @ElementCollection
-    @CollectionTable(name = "product_change_breakdown", joinColumns = @JoinColumn(name = "product_id"))
-    @MapKeyColumn(name = "coin")
-    @Column(name = "quantity")
-    private Map<String, Integer> changeBreakdown = new HashMap<>();
-
     @PrePersist
     public void prePersist() {
         this.timestamp = LocalDateTime.now();
